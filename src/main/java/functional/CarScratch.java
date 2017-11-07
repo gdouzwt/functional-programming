@@ -5,24 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@FunctionalInterface
-interface Criterion<E> {
-  boolean test(E c);
-}
-
 public class CarScratch {
-  
-  public static <E> Criterion<E> negate(Criterion<E> crit) {
-    return x -> !crit.test(x);
-  }
-  
-  public static <E> Criterion<E> and(Criterion<E> first, Criterion<E> second) {
-    return x -> first.test(x) && second.test(x);
-  }
-  
-  public static <E> Criterion<E> or(Criterion<E> first, Criterion<E> second) {
-    return x -> first.test(x) || second.test(x);
-  }
   
   public static <E> void showAll(List<E> lc) {
     for (E c : lc) {
@@ -85,12 +68,12 @@ public class CarScratch {
     System.out.println("Fuel >= 7");
     showAll(filter(cars, sevenPlus));
     System.out.println("Not Fuel >= 7");
-    showAll(filter(cars, negate(sevenPlus)));
+    showAll(filter(cars, Criterion.negate(sevenPlus)));
     
     System.out.println("Four passengers or Black");
-    showAll(filter(cars, or(Car.getFourPassengerCriterion(), Car.getColorCriterion("Black"))));
+    showAll(filter(cars, Criterion.or(Car.getFourPassengerCriterion(), Car.getColorCriterion("Black"))));
 
     System.out.println("Four passengers and Red");
-    showAll(filter(cars, and(Car.getFourPassengerCriterion(), Car.getColorCriterion("Red"))));
+    showAll(filter(cars, Criterion.and(Car.getFourPassengerCriterion(), Car.getColorCriterion("Red"))));
   }
 }
