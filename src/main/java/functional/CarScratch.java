@@ -24,6 +24,18 @@ class RedCarCriterion implements CarCriterion {
     }
 }
 
+class GasLevelCarCriterion implements CarCriterion {
+    private int threshold;
+
+    public GasLevelCarCriterion(int threshold) {
+        this.threshold = threshold;
+    }
+    @Override
+    public boolean test(Car car) {
+        return car.getGasLevel() >= threshold;
+    }
+}
+
 public class CarScratch {
     public static void showAll(List<Car> lc) {
         for (Car c : lc) {
@@ -32,27 +44,17 @@ public class CarScratch {
         System.out.println("-------------------------------------");
     }
 
-    public static List<Car> getColoredCars(Iterable<Car> in, String color) {
+    public static List<Car> getCarsByCriterion(Iterable<Car> in, CarCriterion crit) {
         List<Car> output = new ArrayList<>();
 
         for (Car c : in) {
-            if (c.getColor().equals(color)) {
+            if (crit.test(c)) {
                 output.add(c);
             }
         }
         return output;
     }
 
-    public static List<Car> getCarsByGasLevel(Iterable<Car> in, int gasLevel) {
-        List<Car> output = new ArrayList<>();
-
-        for (Car c : in) {
-            if (c.getGasLevel() >= gasLevel) {
-                output.add(c);
-            }
-        }
-        return output;
-    }
 
     // 实际这里边包含两个过程，其一是在一个Iterable里边找东西，并放到另一个列表里。 第二步骤是如何判断是否放入。
     // - how to make a sublist
@@ -68,10 +70,9 @@ public class CarScratch {
                 Car.withGasColorPassengers(6, "Red", "Ender", "Hyrum", "Locke", "Bonzo")
         );
         showAll(cars);
-        showAll(getColoredCars(cars, "Black"));
-
-        cars.sort(new PassengerCountOrder());
-
+        showAll(getCarsByCriterion(cars, new RedCarCriterion()));
+        showAll(getCarsByCriterion(cars, new GasLevelCarCriterion(6)));
+//        cars.sort(new PassengerCountOrder());
         showAll(cars);
     }
 }
