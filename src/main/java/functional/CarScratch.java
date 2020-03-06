@@ -1,5 +1,6 @@
 package functional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,41 +14,23 @@ class PassengerCountOrder implements Comparator<Car> {
 }
 
 @FunctionalInterface
-interface CarCriterion {
-    boolean test(Car car);
+interface Criterion<E> {
+    boolean test(E car);
 }
 
-class RedCarCriterion implements CarCriterion {
-    @Override
-    public boolean test(Car car) {
-        return car.getColor().equals("Red");
-    }
-}
-
-class GasLevelCarCriterion implements CarCriterion {
-    private int threshold;
-
-    public GasLevelCarCriterion(int threshold) {
-        this.threshold = threshold;
-    }
-    @Override
-    public boolean test(Car car) {
-        return car.getGasLevel() >= threshold;
-    }
-}
 
 public class CarScratch {
-    public static void showAll(List<Car> lc) {
-        for (Car c : lc) {
+    public static <E> void showAll(List<E> lc) {
+        for (E c : lc) {
             System.out.println(c);
         }
         System.out.println("-------------------------------------");
     }
 
-    public static List<Car> getCarsByCriterion(Iterable<Car> in, CarCriterion crit) {
-        List<Car> output = new ArrayList<>();
+    public static <E> List<E> getByCriterion(Iterable<E> in, Criterion<E> crit) {
+        List<E> output = new ArrayList<>();
 
-        for (Car c : in) {
+        for (E c : in) {
             if (crit.test(c)) {
                 output.add(c);
             }
@@ -70,9 +53,24 @@ public class CarScratch {
                 Car.withGasColorPassengers(6, "Red", "Ender", "Hyrum", "Locke", "Bonzo")
         );
         showAll(cars);
-        showAll(getCarsByCriterion(cars, new RedCarCriterion()));
-        showAll(getCarsByCriterion(cars, new GasLevelCarCriterion(6)));
+        showAll(getByCriterion(cars, Car.getRedCarCriterion()));
+        showAll(getByCriterion(cars, Car.getGasLevelCarCriterion(6)));
 //        cars.sort(new PassengerCountOrder());
         showAll(cars);
+        cars.sort(Car.getCarGasComparator());
+        showAll(cars);
+
+        showAll(getByCriterion(cars, car -> car.getPassengers().size() == 2));
+        showAll(getByCriterion(cars, Car.getFourPassengerCriterion()));
+
+        List<String> colors = Arrays.asList("LightCoral", "pink", "Orange", "Gold", "plum", "Blue", "limegreen");
+
+        showAll(getByCriterion(colors, st -> st.length() > 4));
+        showAll(getByCriterion(colors, st -> Character.isUpperCase(st.charAt(0))));
+
+        LocalDate today = LocalDate.now();
+        List<LocalDate> dates = Arrays.asList(today, today.plusDays(1), today.plusDays(7), today.minusDays(1));
+
+        showAll(getByCriterion(dates, ld -> ld.isAfter(today)));
     }
 }
